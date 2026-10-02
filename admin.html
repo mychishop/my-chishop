@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - MYCHISHOP</title>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; font-family: 'Kanit', sans-serif; margin: 0; padding: 0; }
+    body { background-color: #f4f6f8; padding: 20px; color: #333; }
+    .container { max-width: 800px; margin: 0 auto; }
+    .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+    h2 { margin-bottom: 20px; color: #1a1a1a; font-size: 1.4rem; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; font-size: 0.9rem; font-weight: 500; margin-bottom: 5px; }
+    input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 0.95rem; }
+    button { background-color: #06C755; color: white; border: none; padding: 12px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; width: 100%; font-size: 1rem; }
+    button:hover { background-color: #05b34c; }
+    .hidden { display: none; }
+    .product-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee; }
+    .status-btn { width: auto; padding: 6px 12px; font-size: 0.85rem; }
+    .btn-active { background-color: #28a745; }
+    .btn-out { background-color: #dc3545; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- หน้า Login เข้าสู่ระบบ Admin -->
+    <div id="loginSection" class="card">
+      <h2>🔐 ระบบหลังบ้านสำหรับแอดมิน</h2>
+      <div class="form-group">
+        <label>รหัสผ่านแอดมิน (Admin Password):</label>
+        <input type="password" id="adminPass" placeholder="กรอกรหัสผ่านเพื่อเข้าใช้งาน">
+      </div>
+      <button onclick="login()">เข้าสู่ระบบ</button>
+    </div>
+
+    <!-- หน้า Dashboard แอดมิน -->
+    <div id="adminDashboard" class="hidden">
+      <!-- ฟอร์มเพิ่มสินค้าใหม่ -->
+      <div class="card">
+        <h2>➕ เพิ่มรายการสินค้าใหม่</h2>
+        <form id="addForm" onsubmit="handleAddProduct(event)">
+          <div class="form-group">
+            <label>รหัสสินค้า (ID):</label>
+            <input type="text" id="pId" placeholder="เช่น P003" required>
+          </div>
+          <div class="form-group">
+            <label>ชื่อสินค้า:</label>
+            <input type="text" id="pName" placeholder="เช่น เสื้อเชิ้ตแขนยาว" required>
+          </div>
+          <div class="form-group">
+            <label>ราคา (บาท):</label>
+            <input type="number" id="pPrice" placeholder="เช่น 390" required>
+          </div>
+          <div class="form-group">
+            <label>รายละเอียดสินค้า:</label>
+            <textarea id="pDesc" rows="3" placeholder="ระบุรายละเอียด เช่น ขนาด, สี, ผ้า"></textarea>
+          </div>
+          <div class="form-group">
+            <label>URL รูปภาพสินค้า:</label>
+            <input type="url" id="pImg" placeholder="https://..." required>
+          </div>
+          <div class="form-group">
+            <label>ลิงก์ LINE สำหรับสั่งซื้อ:</label>
+            <input type="url" id="pLine" placeholder="https://line.me/ti/p/..." required>
+          </div>
+          <div class="form-group">
+            <label>สถานะสินค้า:</label>
+            <select id="pStatus">
+              <option value="active"> active (พร้อมส่ง)</option>
+              <option value="out of stock"> out of stock (สินค้าหมด)</option>
+            </select>
+          </div>
+          <button type="submit" id="submitBtn">บันทึกเพิ่มสินค้า</button>
+        </form>
+      </div>
+
+      <!-- รายการจัดการสถานะสินค้า -->
+      <div class="card">
+        <h2>📦 จัดการสถานะสินค้าที่มีอยู่</h2>
+        <div id="productList">กำลังโหลดรายการสินค้า...</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // *** นำ Web App URL ที่ได้จาก Apps Script มาวางแทนตรงนี้ ***
+    const API_URL = "https://script.google.com/macros/s/AKfycbyZ9rwSsMYjRDR-_xmG6Y74zJZnpPDAiD12CSxyr0J1FeZllCsJzRF8_rQUIEYRWWTN/exec";
+    let savedPassword = "";
+
+    function login() {
+      const pass = document.getElementById('adminPass').value;
+      if (!pass) return alert("กรุณากรอกรหัสผ่าน");
+      savedPassword = pass;
+      document.getElementById('loginSection').classList.add('hidden');
+      document.getElementById('adminDashboard').classList.remove('hidden');
+      loadProducts();
+    }
+
+    async function loadProducts() {
+      const res = await fetch(API_URL);
+      const data = await res.json();
+      const listEl = document.getElementById('productList');
+      listEl.innerHTML = "";
+
+      data.forEach(p => {
+        const item = document.createElement('div');
+        item.className = 'product-item';
+        const isActive = p.status === 'active';
+        item.innerHTML = `
+          <div>
+            <strong>[${p.id}] ${p.name}</strong> - ฿${p.price}
+          </div>
+          <button class="status-btn ${isActive ? 'btn-active' : 'btn-out'}" onclick="toggleStatus('${p.id}', '${isActive ? 'out of stock' : 'active'}')">
+            ${isActive ? 'พร้อมส่ง (กดเพื่อเปลี่ยนเป็นหมด)' : 'หมด (กดเพื่อเปลี่ยนเป็นพร้อมส่ง)'}
+          </button>
+        `;
+        listEl.appendChild(item);
+      });
+    }
+
+    async function handleAddProduct(e) {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      btn.innerText = "กำลังบันทึก...";
+      btn.disabled = true;
+
+      const payload = {
+        password: savedPassword,
+        action: "add",
+        product: {
+          id: document.getElementById('pId').value,
+          name: document.getElementById('pName').value,
+          price: document.getElementById('pPrice').value,
+          description: document.getElementById('pDesc').value,
+          image_url: document.getElementById('pImg').value,
+          line_link: document.getElementById('pLine').value,
+          status: document.getElementById('pStatus').value
+        }
+      };
+
+      const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+      const result = await res.json();
+      alert(result.message);
+
+      if (result.success) {
+        document.getElementById('addForm').reset();
+        loadProducts();
+      }
+      btn.innerText = "บันทึกเพิ่มสินค้า";
+      btn.disabled = false;
+    }
+
+    async function toggleStatus(id, newStatus) {
+      const payload = {
+        password: savedPassword,
+        action: "updateStatus",
+        id: id,
+        status: newStatus
+      };
+
+      const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+      const result = await res.json();
+      alert(result.message);
+      if (result.success) loadProducts();
+    }
+  </script>
+</body>
+</html>
