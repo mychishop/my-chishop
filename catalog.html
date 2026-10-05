@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MYCHISHOP - Catalog</title>
+  
+  <!-- Google Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --bg-color: #f7f3f0;
+      --pink-card: #f8c8d8;
+      --pink-main: #e898ac;
+      --pink-badge: #e63956;
+      --green-line: #06C755;
+      --text-dark: #4a3e3d;
+      --white: #ffffff;
+    }
+
+    * { box-sizing: border-box; font-family: 'Kanit', sans-serif; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-dark);
+      padding: 30px 15px 50px;
+    }
+
+    .container {
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* Header & Branding */
+    .brand-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .brand-logo {
+      font-size: 2.3rem;
+      font-weight: 700;
+      color: var(--pink-main);
+      letter-spacing: 1px;
+    }
+    .brand-slogan {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #666;
+      margin-top: 4px;
+    }
+
+    /* Highlights / Stats */
+    .stats-container {
+      margin: 20px 0 25px;
+    }
+    .stat-pill {
+      background-color: #fce4ec;
+      color: var(--text-dark);
+      padding: 12px 20px;
+      border-radius: 30px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .stat-pill i { color: #e91e63; font-size: 1.1rem; }
+
+    /* Category Section */
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      text-align: center;
+      margin: 25px 0 16px;
+      color: var(--text-dark);
+    }
+
+    .category-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+    .category-card {
+      background: var(--white);
+      border-radius: 20px;
+      padding: 24px 15px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 2px solid transparent;
+    }
+    .category-card:hover, .category-card.active {
+      transform: translateY(-3px);
+      border-color: var(--pink-main);
+      box-shadow: 0 6px 20px rgba(232, 152, 172, 0.25);
+    }
+    .category-icon {
+      font-size: 2.2rem;
+      color: var(--pink-main);
+      margin-bottom: 10px;
+    }
+    .category-name {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      letter-spacing: 0.5px;
+    }
+
+    /* Product Grid & Cards */
+    .product-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      min-height: 100px;
+    }
+
+    .product-card {
+      background: var(--white);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #f0ece9;
+    }
+
+    .badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: var(--pink-badge);
+      color: white;
+      font-size: 0.68rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      z-index: 2;
+    }
+
+    .badge-out {
+      background: #888;
+    }
+
+    .product-img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      height: auto;
+      object-fit: cover;
+      background-color: #fafafa;
+    }
+
+    .product-details {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .product-title {
+      font-size: 0.92rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: #333;
+    }
+
+    .product-price-info {
+      font-size: 0.9rem;
+      color: #d8708d;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .order-btn {
+      margin-top: auto;
+      background-color: var(--green-line);
+      color: white;
+      text-align: center;
+      padding: 8px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: opacity 0.2s;
+    }
+
+    .order-btn:hover {
+      opacity: 0.9;
+    }
+
+    .order-btn.disabled {
+      background-color: #ccc;
+      pointer-events: none;
+    }
+
+    /* Footer */
+    footer {
+      margin-top: 35px;
+      background: var(--white);
+      padding: 22px 20px;
+      border-radius: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+      font-size: 0.85rem;
+      color: #666;
+      text-align: center;
+    }
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+    .footer-links a {
+      color: #333;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header -->
+    <div class="brand-header">
+      <div class="brand-logo">MYCHISHOP</div>
+      <div class="brand-slogan">Premium Apps Hub — หารความสุข ในราคาสบายกระเป๋า ✨</div>
+    </div>
+
+    <!-- จุดเด่นบริการ -->
+    <div class="stats-container">
+      <div class="stat-pill">
+        <i class="fa-solid fa-bolt"></i>
+        <span>แอปพรีเมียมแท้ 100% ส่งไว มีประกันตลอดการใช้งาน</span>
+      </div>
+    </div>
+
+    <!-- หมวดหมู่แอป -->
+    <div class="section-title">เลือกหมวดหมู่แอปพรีเมียม...</div>
+    <div class="category-grid">
+      <div class="category-card" onclick="filterCategory('STREAMING', this)">
+        <div class="category-icon"><i class="fa-solid fa-film"></i></div>
+        <div class="category-name">STREAMING</div>
+      </div>
+      <div class="category-card" onclick="filterCategory('MUSIC & AUDIO', this)">
+        <div class="category-icon"><i class="fa-solid fa-music"></i></div>
+        <div class="category-name">MUSIC & AUDIO</div>
+      </div>
+      <div class="category-card" onclick="filterCategory('DESIGN & WORK', this)">
+        <div class="category-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+        <div class="category-name">DESIGN & WORK</div>
+      </div>
+      <div class="category-card" onclick="filterCategory('PROMOTION', this)">
+        <div class="category-icon"><i class="fa-solid fa-fire"></i></div>
+        <div class="category-name">PROMOTION</div>
+      </div>
+    </div>
+
+    <!-- รายการแอปสินค้า -->
+    <div class="section-title" id="catalogTitle">📱 รายการแอปพรีเมียมทั้งหมด...</div>
+    <div id="productList" class="product-grid">
+      <p style="grid-column: 1/-1; text-align: center; color: #999; padding: 20px;">กำลังโหลดรายการแอป...</p>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <div class="footer-links">
+        <a href="https://line.me/ti/p/~your_line_id" target="_blank">
+          <i class="fa-brands fa-line" style="color: #06C755; font-size: 1.3rem;"></i> 
+          สอบถาม / สั่งซื้อผ่าน LINE
+        </a>
+      </div>
+      <p>⚡ MYCHISHOP บริการหารแอปพรีเมียม ปลอดภัย ซัพพอร์ตตลอด 24 ชม.</p>
+    </footer>
+  </div>
+
+  <script>
+    // URL API จาก Google Apps Script สำหรับดึงข้อมูลสินค้า
+    const API_URL = "https://script.google.com/macros/s/AKfycbyZ9rwSsMYjRDR-_xmG6Y74zJZnpPDAiD12CSxyr0J1FeZllCsJzRF8_rQUIEYRWWTN/exec";
+    
+    let globalProducts = [];
+    let selectedCategory = "";
+
+    async function fetchProducts() {
+      try {
+        const res = await fetch(API_URL, { method: "GET", redirect: "follow" });
+        const textData = await res.text();
+        globalProducts = JSON.parse(textData);
+        renderProducts();
+      } catch (e) {
+        console.error("Error loading products:", e);
+        document.getElementById('productList').innerHTML = '<p style="grid-column:1/-1; text-align:center; color:#999; padding:20px;">ไม่สามารถโหลดข้อมูลสินค้าได้</p>';
+      }
+    }
+
+    function createCardHtml(item) {
+      const isOut = item.status === 'out of stock';
+      const orderMsg = encodeURIComponent(`สวัสดีค่ะ สนใจสั่งซื้อ/หารแอป: ${item.name} (ราคา ฿${item.price})`);
+      const lineLink = item.line_link ? `${item.line_link}?text=${orderMsg}` : '#';
+
+      return `
+        <div class="product-card">
+          ${isOut ? '<span class="badge badge-out">หมด</span>' : (item.is_hot === true || item.is_hot === 'true' ? '<span class="badge">HOT</span>' : '')}
+          <img class="product-img" src="${item.image_url || 'https://via.placeholder.com/300'}" alt="${item.name}">
+          <div class="product-details">
+            <div class="product-title">${item.name || 'ไม่มีชื่อสินค้า'}</div>
+            <div class="product-price-info">เริ่มต้น ฿${Number(item.price || 0).toLocaleString()}</div>
+            <a href="${isOut ? 'javascript:void(0)' : lineLink}" target="${isOut ? '_self' : '_blank'}" class="order-btn ${isOut ? 'disabled' : ''}">
+              <i class="fa-brands fa-line"></i> ${isOut ? 'สินค้าหมด' : 'สั่งซื้อ/สอบถาม'}
+            </a>
+          </div>
+        </div>
+      `;
+    }
+
+    function filterCategory(category, element) {
+      const cards = document.querySelectorAll('.category-card');
+      
+      if (selectedCategory === category) {
+        selectedCategory = "";
+        cards.forEach(c => c.classList.remove('active'));
+        document.getElementById('catalogTitle').innerText = "📱 รายการแอปพรีเมียมทั้งหมด...";
+      } else {
+        selectedCategory = category;
+        cards.forEach(c => c.classList.remove('active'));
+        element.classList.add('active');
+        document.getElementById('catalogTitle').innerText = `📱 หมวดหมู่: ${category}`;
+      }
+
+      renderProducts();
+    }
+
+    function renderProducts() {
+      const productList = document.getElementById('productList');
+
+      if (!Array.isArray(globalProducts) || globalProducts.length === 0) {
+        productList.innerHTML = '<p style="grid-column:1/-1; text-align:center; color:#aaa; padding:20px;">ไม่พบข้อมูลสินค้าในระบบ</p>';
+        return;
+      }
+
+      // กรองตามหมวดหมู่ถ้ามีการเลือก
+      let displayProducts = globalProducts;
+      if (selectedCategory !== "") {
+        displayProducts = globalProducts.filter(p => p.category === selectedCategory);
+      }
+
+      if (displayProducts.length > 0) {
+        productList.innerHTML = displayProducts.map(createCardHtml).join('');
+      } else {
+        productList.innerHTML = '<p style="grid-column:1/-1; text-align:center; color:#aaa; padding:20px;">ไม่พบสินค้าในหมวดหมู่นี้</p>';
+      }
+    }
+
+    fetchProducts();
+  </script>
+</body>
+</html>
