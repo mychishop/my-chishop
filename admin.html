@@ -5,22 +5,82 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Dashboard - MYCHISHOP</title>
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     * { box-sizing: border-box; font-family: 'Kanit', sans-serif; margin: 0; padding: 0; }
     body { background-color: #f4f6f8; padding: 20px; color: #333; }
-    .container { max-width: 800px; margin: 0 auto; }
+    .container { max-width: 850px; margin: 0 auto; }
     .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
-    h2 { margin-bottom: 20px; color: #1a1a1a; font-size: 1.4rem; }
+    h2 { margin-bottom: 20px; color: #1a1a1a; font-size: 1.4rem; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
     .form-group { margin-bottom: 15px; }
     label { display: block; font-size: 0.9rem; font-weight: 500; margin-bottom: 5px; }
     input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 0.95rem; }
+    
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #e63956;
+      background: #fff0f3;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px dashed #f8c8d8;
+    }
+    .checkbox-label input[type="checkbox"] { width: auto; cursor: pointer; }
+
     button { background-color: #06C755; color: white; border: none; padding: 12px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; width: 100%; font-size: 1rem; }
     button:hover { background-color: #05b34c; }
     .hidden { display: none; }
-    .product-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee; }
-    .status-btn { width: auto; padding: 6px 12px; font-size: 0.85rem; }
+    
+    .product-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid #eee;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .product-info-text { font-size: 0.92rem; flex: 1; min-width: 200px; }
+    .badge-cat { background: #e898ac; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; margin-left: 5px; }
+    .badge-hot { background: #ff4757; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; margin-left: 5px; }
+
+    .action-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+    .status-btn { width: auto; padding: 6px 12px; font-size: 0.82rem; border-radius: 6px; }
     .btn-active { background-color: #28a745; }
-    .btn-out { background-color: #dc3545; }
+    .btn-out { background-color: #6c757d; }
+    .btn-hot-toggle { background-color: #ff6b81; }
+    .btn-hot-toggle.active { background-color: #ff4757; }
+    .btn-hot-toggle.inactive { background-color: #aaa; }
+    .btn-edit { background-color: #ffc107; color: #212529; }
+    .btn-delete { background-color: #dc3545; color: white; }
+
+    .img-preview-box { margin-top: 10px; text-align: center; }
+    .img-preview-box img { max-width: 120px; max-height: 120px; border-radius: 8px; border: 1px dashed #ccc; object-fit: cover; }
+    
+    .edit-mode-banner {
+      background-color: #fff3cd;
+      color: #856404;
+      padding: 10px 15px;
+      border-radius: 6px;
+      margin-bottom: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .btn-cancel-edit {
+      background-color: #6c757d;
+      color: white;
+      border: none;
+      padding: 5px 12px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      width: auto;
+    }
   </style>
 </head>
 <body>
@@ -38,36 +98,72 @@
 
     <!-- หน้า Dashboard แอดมิน -->
     <div id="adminDashboard" class="hidden">
-      <!-- ฟอร์มเพิ่มสินค้าใหม่ -->
+      <!-- ฟอร์มเพิ่ม/แก้ไขสินค้า -->
       <div class="card">
-        <h2>➕ เพิ่มรายการสินค้าใหม่</h2>
-        <form id="addForm" onsubmit="handleAddProduct(event)">
+        <h2 id="formTitle">
+          <span>➕ เพิ่มรายการสินค้าใหม่</span>
+        </h2>
+        
+        <div id="editBanner" class="edit-mode-banner hidden">
+          <span>✏️ กำลังอยู่ในโหมดแก้ไขสินค้า ID: <strong id="editingIdText"></strong></span>
+          <button type="button" class="btn-cancel-edit" onclick="resetForm()">ยกเลิกการแก้ไข</button>
+        </div>
+
+        <form id="addForm" onsubmit="handleFormSubmit(event)">
+          <!-- Hidden field ไว้เก็บโหมดการทำงาน (add หรือ edit) -->
+          <input type="hidden" id="formAction" value="add">
+
           <div class="form-group">
             <label>รหัสสินค้า (ID):</label>
-            <input type="text" id="pId" placeholder="เช่น P003" required>
+            <input type="text" id="pId" placeholder="เช่น P001" required>
           </div>
           <div class="form-group">
-            <label>ชื่อสินค้า:</label>
-            <input type="text" id="pName" placeholder="เช่น เสื้อเชิ้ตแขนยาว" required>
+            <label>ชื่อสินค้า / ชื่อแอป:</label>
+            <input type="text" id="pName" placeholder="เช่น YouTube Premium 1 เดือน" required>
           </div>
+
+          <!-- หมวดหมู่สินค้า -->
+          <div class="form-group">
+            <label>เลือกหมวดหมู่สินค้า:</label>
+            <select id="pCategory" required>
+              <option value="STREAMING">🎬 STREAMING</option>
+              <option value="MUSIC & AUDIO">🎵 MUSIC & AUDIO</option>
+              <option value="DESIGN & WORK">🎨 DESIGN & WORK</option>
+              <option value="PROMOTION">🔥 PROMOTION</option>
+            </select>
+          </div>
+
+          <!-- ติ๊กเป็นสินค้ายอดฮิต -->
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="pHot">
+              <span>🔥 ตั้งเป็นสินค้ายอดฮิต (แสดงในช่องแอปพรีเมียมยอดฮิต)</span>
+            </label>
+          </div>
+
           <div class="form-group">
             <label>ราคา (บาท):</label>
-            <input type="number" id="pPrice" placeholder="เช่น 390" required>
+            <input type="number" id="pPrice" placeholder="เช่น 35" required>
           </div>
           <div class="form-group">
             <label>รายละเอียดสินค้า:</label>
-            <textarea id="pDesc" rows="3" placeholder="ระบุรายละเอียด เช่น ขนาด, สี, ผ้า"></textarea>
+            <textarea id="pDesc" rows="3" placeholder="ระบุรายละเอียดแพ็กเกจ/เงื่อนไข"></textarea>
           </div>
+          
           <div class="form-group">
-            <label>URL รูปภาพสินค้า:</label>
-            <input type="url" id="pImg" placeholder="https://..." required>
+            <label id="imgLabel">อัปโหลดรูปภาพสินค้า (เลือกไฟล์รูปภาพ):</label>
+            <input type="file" id="pImgFile" accept="image/*" onchange="previewImage(event)">
+            <div class="img-preview-box">
+              <img id="imgPreview" class="hidden" alt="ภาพตัวอย่าง">
+            </div>
           </div>
+
           <div class="form-group">
             <label>ลิงก์ LINE สำหรับสั่งซื้อ:</label>
             <input type="url" id="pLine" placeholder="https://line.me/ti/p/..." required>
           </div>
           <div class="form-group">
-            <label>สถานะสินค้า:</label>
+            <label>สถานะสินค้าเริ่มต้น:</label>
             <select id="pStatus">
               <option value="active"> active (พร้อมส่ง)</option>
               <option value="out of stock"> out of stock (สินค้าหมด)</option>
@@ -79,16 +175,17 @@
 
       <!-- รายการจัดการสถานะสินค้า -->
       <div class="card">
-        <h2>📦 จัดการสถานะสินค้าที่มีอยู่</h2>
+        <h2>📦 จัดการสถานะ แก้ไข & ลบสินค้า</h2>
         <div id="productList">กำลังโหลดรายการสินค้า...</div>
       </div>
     </div>
   </div>
 
   <script>
-    // *** นำ Web App URL ที่ได้จาก Apps Script มาวางแทนตรงนี้ ***
     const API_URL = "https://script.google.com/macros/s/AKfycbyZ9rwSsMYjRDR-_xmG6Y74zJZnpPDAiD12CSxyr0J1FeZllCsJzRF8_rQUIEYRWWTN/exec";
     let savedPassword = "";
+    let base64Image = "";
+    let cachedProducts = [];
 
     function login() {
       const pass = document.getElementById('adminPass').value;
@@ -99,60 +196,204 @@
       loadProducts();
     }
 
-    async function loadProducts() {
-      const res = await fetch(API_URL);
-      const data = await res.json();
-      const listEl = document.getElementById('productList');
-      listEl.innerHTML = "";
-
-      data.forEach(p => {
-        const item = document.createElement('div');
-        item.className = 'product-item';
-        const isActive = p.status === 'active';
-        item.innerHTML = `
-          <div>
-            <strong>[${p.id}] ${p.name}</strong> - ฿${p.price}
-          </div>
-          <button class="status-btn ${isActive ? 'btn-active' : 'btn-out'}" onclick="toggleStatus('${p.id}', '${isActive ? 'out of stock' : 'active'}')">
-            ${isActive ? 'พร้อมส่ง (กดเพื่อเปลี่ยนเป็นหมด)' : 'หมด (กดเพื่อเปลี่ยนเป็นพร้อมส่ง)'}
-          </button>
-        `;
-        listEl.appendChild(item);
-      });
+    function previewImage(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          base64Image = e.target.result;
+          const preview = document.getElementById('imgPreview');
+          preview.src = base64Image;
+          preview.classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+      }
     }
 
-    async function handleAddProduct(e) {
+    async function loadProducts() {
+      try {
+        const res = await fetch(API_URL);
+        cachedProducts = await res.json();
+        const listEl = document.getElementById('productList');
+        listEl.innerHTML = "";
+
+        if(!Array.isArray(cachedProducts) || cachedProducts.length === 0) {
+          listEl.innerHTML = "<p style='text-align:center; color:#999;'>ไม่พบรายการสินค้า</p>";
+          return;
+        }
+
+        cachedProducts.forEach(p => {
+          const item = document.createElement('div');
+          item.className = 'product-item';
+          const isActive = p.status === 'active';
+          const isHot = p.is_hot === true || p.is_hot === 'true';
+
+          item.innerHTML = `
+            <div class="product-info-text">
+              <strong>[${p.id}] ${p.name}</strong> - ฿${p.price}
+              <br>
+              <span class="badge-cat">${p.category || 'ทั่วไป'}</span>
+              ${isHot ? '<span class="badge-hot">🔥 ยอดฮิต</span>' : ''}
+            </div>
+            <div class="action-btns">
+              <button class="status-btn btn-hot-toggle ${isHot ? 'active' : 'inactive'}" onclick="toggleHot('${p.id}', ${!isHot})">
+                ${isHot ? '🔥 ถอดฮิต' : '✨ ตั้งฮิต'}
+              </button>
+              <button class="status-btn ${isActive ? 'btn-active' : 'btn-out'}" onclick="toggleStatus('${p.id}', '${isActive ? 'out of stock' : 'active'}')">
+                ${isActive ? 'พร้อมส่ง' : 'สินค้าหมด'}
+              </button>
+              <button class="status-btn btn-edit" onclick="startEditProduct('${p.id}')">
+                <i class="fa-solid fa-pen-to-square"></i> แก้ไข
+              </button>
+              <button class="status-btn btn-delete" onclick="deleteProduct('${p.id}', '${p.name}')">
+                <i class="fa-solid fa-trash"></i> ลบ
+              </button>
+            </div>
+          `;
+          listEl.appendChild(item);
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // ฟังก์ชันเริ่มโหมดแก้ไขสินค้า
+    function startEditProduct(id) {
+      const p = cachedProducts.find(item => String(item.id) === String(id));
+      if (!p) return alert("ไม่พบข้อมูลสินค้า");
+
+      document.getElementById('formAction').value = "edit";
+      document.getElementById('pId').value = p.id;
+      document.getElementById('pId').readOnly = true; // ล็อค ID ห้ามแก้ยามแก้ไข
+      document.getElementById('pName').value = p.name || '';
+      document.getElementById('pCategory').value = p.category || 'STREAMING';
+      document.getElementById('pHot').checked = p.is_hot === true || p.is_hot === 'true';
+      document.getElementById('pPrice').value = p.price || '';
+      document.getElementById('pDesc').value = p.description || '';
+      document.getElementById('pLine').value = p.line_link || '';
+      document.getElementById('pStatus').value = p.status || 'active';
+
+      // จัดการรูปภาพเดิม
+      if (p.image_url) {
+        base64Image = p.image_url;
+        const preview = document.getElementById('imgPreview');
+        preview.src = p.image_url;
+        preview.classList.remove('hidden');
+        document.getElementById('imgLabel').innerText = "อัปโหลดรูปภาพใหม่ (หากไม่ต้องการเปลี่ยนให้เว้นไว้):";
+      }
+
+      // ปรับ UI
+      document.getElementById('formTitle').innerHTML = "<span>✏️ แก้ไขรายการสินค้า</span>";
+      document.getElementById('editingIdText').innerText = p.id;
+      document.getElementById('editBanner').classList.remove('hidden');
+      document.getElementById('submitBtn').innerText = "บันทึกการแก้ไขสินค้า";
+      document.getElementById('pImgFile').required = false;
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ฟังก์ชันรีเซ็ตฟอร์มกลับเป็นโหมดเพิ่มสินค้าปกติ
+    function resetForm() {
+      document.getElementById('addForm').reset();
+      document.getElementById('formAction').value = "add";
+      document.getElementById('pId').readOnly = false;
+      document.getElementById('formTitle').innerHTML = "<span>➕ เพิ่มรายการสินค้าใหม่</span>";
+      document.getElementById('editBanner').classList.add('hidden');
+      document.getElementById('submitBtn').innerText = "บันทึกเพิ่มสินค้า";
+      document.getElementById('imgPreview').classList.add('hidden');
+      document.getElementById('imgLabel').innerText = "อัปโหลดรูปภาพสินค้า (เลือกไฟล์รูปภาพ):";
+      document.getElementById('pImgFile').required = true;
+      base64Image = "";
+    }
+
+    // ฟังก์ชันส่งฟอร์ม (รองรับทั้ง เพิ่ม และ แก้ไข)
+    async function handleFormSubmit(e) {
       e.preventDefault();
+      
+      const action = document.getElementById('formAction').value;
+
+      if (action === "add" && !base64Image) {
+        alert("กรุณาเลือกไฟล์รูปภาพ");
+        return;
+      }
+
       const btn = document.getElementById('submitBtn');
-      btn.innerText = "กำลังบันทึก...";
+      btn.innerText = "กำลังบันทึกข้อมูล...";
       btn.disabled = true;
 
       const payload = {
         password: savedPassword,
-        action: "add",
+        action: action, // "add" หรือ "edit"
         product: {
           id: document.getElementById('pId').value,
           name: document.getElementById('pName').value,
+          category: document.getElementById('pCategory').value,
+          is_hot: document.getElementById('pHot').checked,
           price: document.getElementById('pPrice').value,
           description: document.getElementById('pDesc').value,
-          image_url: document.getElementById('pImg').value,
+          image_url: base64Image,
           line_link: document.getElementById('pLine').value,
           status: document.getElementById('pStatus').value
         }
       };
 
-      const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
-      const result = await res.json();
-      alert(result.message);
+      try {
+        const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+        const result = await res.json();
+        alert(result.message);
 
-      if (result.success) {
-        document.getElementById('addForm').reset();
-        loadProducts();
+        if (result.success) {
+          resetForm();
+          loadProducts();
+        }
+      } catch (err) {
+        alert("เกิดข้อผิดพลาดในการบันทึก");
+        console.error(err);
       }
-      btn.innerText = "บันทึกเพิ่มสินค้า";
+
       btn.disabled = false;
     }
 
+    // ฟังก์ชันลบสินค้า
+    async function deleteProduct(id, name) {
+      if (!confirm(`คุณต้องการลบสินค้า [${id}] "${name}" ใช่หรือไม่?`)) return;
+
+      const payload = {
+        password: savedPassword,
+        action: "delete",
+        id: id
+      };
+
+      try {
+        const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+        const result = await res.json();
+        alert(result.message);
+        if (result.success) loadProducts();
+      } catch (e) {
+        alert("ไม่สามารถลบสินค้าได้");
+      }
+    }
+
+    // ฟังก์ชันเปิด-ปิด สถานะยอดฮิต (Hot)
+    async function toggleHot(id, newHotStatus) {
+      const payload = {
+        password: savedPassword,
+        action: "updateHot",
+        id: id,
+        is_hot: newHotStatus
+      };
+
+      try {
+        const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+        const result = await res.json();
+        alert(result.message);
+        if (result.success) loadProducts();
+      } catch (e) {
+        alert("ไม่สามารถอัปเดตสถานะยอดฮิตได้");
+      }
+    }
+
+    // ฟังก์ชันเปลี่ยนสถานะ พร้อมส่ง/หมด
     async function toggleStatus(id, newStatus) {
       const payload = {
         password: savedPassword,
@@ -161,10 +402,14 @@
         status: newStatus
       };
 
-      const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
-      const result = await res.json();
-      alert(result.message);
-      if (result.success) loadProducts();
+      try {
+        const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+        const result = await res.json();
+        alert(result.message);
+        if (result.success) loadProducts();
+      } catch (e) {
+        alert("ไม่สามารถอัปเดตสถานะสินค้าได้");
+      }
     }
   </script>
 </body>
