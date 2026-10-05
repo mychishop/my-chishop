@@ -3,29 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MYCHISHOP - Link & Catalog</title>
+  <title>MYCHISHOP</title>
 
   <!-- Google Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600&family=Kanit:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
     :root {
-      --bg-color: #f7f3f0;
-      --pink-card: #f8c8d8;
-      --pink-hover: #f5b3c7;
-      --text-color: #4a3e3d;
+      --bg-color: #f7f4f2;
+      --pink-card: #f9c7d7;
+      --text-dark: #3a3335;
+      --text-muted: #887e81;
       --white: #ffffff;
       --green-line: #06C755;
     }
 
-    * { box-sizing: border-box; font-family: 'Kanit', sans-serif; margin: 0; padding: 0; }
+    * { 
+      box-sizing: border-box; 
+      font-family: 'Kanit', sans-serif; 
+      margin: 0; 
+      padding: 0; 
+    }
 
     body {
       background-color: var(--bg-color);
-      color: var(--text-color);
+      color: var(--text-dark);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -35,42 +40,44 @@
 
     .bio-container {
       width: 100%;
-      max-width: 420px;
-      text-align: center;
+      max-width: 400px;
       display: flex;
       flex-direction: column;
       align-items: center;
+      text-align: center;
     }
 
-    /* Profile Header */
-    .profile-logo {
-      width: 95px;
-      height: 95px;
-      border-radius: 50%;
-      background: var(--white);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    /* โลโก้โปรไฟล์ทรงกลม */
+    .avatar-wrapper {
       margin-bottom: 12px;
-      border: 3px solid var(--white);
     }
-    .profile-logo i { font-size: 2.8rem; color: #e799b0; }
 
+    .profile-logo-img {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      object-fit: cover;
+      background-color: var(--white);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    /* ชื่อร้าน */
     .username {
-      font-size: 1.3rem;
-      font-weight: 600;
+      font-family: 'Kanit', sans-serif;
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: var(--text-dark);
       margin-bottom: 24px;
-      color: var(--text-color);
+      letter-spacing: 0.3px;
     }
 
-    /* Link Buttons */
+    /* รายการปุ่มลิงก์ */
     .link-list {
       width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 16px;
-      margin-bottom: 30px;
+      gap: 14px;
+      margin-bottom: 35px;
     }
 
     .link-btn {
@@ -78,311 +85,116 @@
       align-items: center;
       justify-content: space-between;
       background-color: var(--pink-card);
-      color: var(--text-color);
-      padding: 16px 20px;
-      border-radius: 14px;
+      color: var(--text-dark);
+      padding: 12px 18px;
+      border-radius: 18px;
       text-decoration: none;
-      font-weight: 500;
+      font-weight: 600;
       font-size: 1.05rem;
       transition: all 0.2s ease;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.03);
-      cursor: pointer;
-      border: none;
-      width: 100%;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
     }
 
     .link-btn:hover {
-      background-color: var(--pink-hover);
       transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(249, 199, 215, 0.6);
     }
 
-    .link-btn .btn-icon {
-      width: 36px;
-      height: 36px;
+    /* ไอคอนวงกลมซ้ายมือ */
+    .btn-icon {
+      width: 40px;
+      height: 40px;
       background: var(--white);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.2rem;
+      font-size: 1.15rem;
+      flex-shrink: 0;
     }
 
-    .link-btn.line .btn-icon { color: var(--green-line); }
-    .link-btn.catalog .btn-icon { color: #e799b0; }
-
-    /* ========================================= */
-    /* POPUP MODAL STYLES (เด้งแคตตาล็อกเต็มจอ) */
-    /* ========================================= */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(4px);
-      display: flex;
-      justify-content: center;
-      align-items: flex-end;
-      z-index: 1000;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease;
+    .link-btn.catalog .btn-icon {
+      color: #e2829c;
     }
 
-    .modal-overlay.active {
-      opacity: 1;
-      visibility: visible;
+    .link-btn.line .btn-icon {
+      color: var(--green-line);
     }
 
-    .modal-content {
-      background: var(--white);
-      width: 100%;
-      max-width: 480px;
-      height: 85vh;
-      border-top-left-radius: 24px;
-      border-top-right-radius: 24px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      transform: translateY(100%);
-      transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      box-shadow: 0 -10px 30px rgba(0,0,0,0.15);
+    .btn-text {
+      flex-grow: 1;
+      text-align: center;
+      padding: 0 10px;
     }
 
-    .modal-overlay.active .modal-content {
-      transform: translateY(0);
+    .dots-icon {
+      color: #c0a3ac;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      padding-right: 4px;
     }
 
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-bottom: 15px;
-      border-bottom: 1px solid #f0ece9;
-    }
-
-    .modal-title {
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: var(--text-color);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .close-btn {
-      background: #f0ece9;
-      border: none;
-      width: 32px; height: 32px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1rem;
-      color: #666;
-      cursor: pointer;
-    }
-
-    .modal-body {
-      flex: 1;
-      overflow-y: auto;
-      padding: 15px 0;
-    }
-
-    /* Product Grid inside Modal */
-    .product-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 15px;
-    }
-
-    .product-card {
-      background: #faf7f5;
-      border-radius: 14px;
-      overflow: hidden;
-      display: flex;
-      text-align: left;
-      border: 1px solid #f0ece9;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
-    }
-
-    .product-img {
-      width: 95px;
-      height: 95px;
-      object-fit: cover;
-    }
-
-    .product-info {
-      padding: 10px 14px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      flex: 1;
-    }
-
-    .product-name {
-      font-size: 0.98rem;
-      font-weight: 600;
-      line-height: 1.3;
-      margin-bottom: 4px;
-      color: #333;
-    }
-
-    .product-price {
-      font-size: 1rem;
-      color: #d8708d;
-      font-weight: 600;
-      margin-bottom: 6px;
-    }
-
-    .order-mini-btn {
-      align-self: flex-start;
-      background: var(--green-line);
-      color: white;
-      padding: 5px 12px;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      text-decoration: none;
-      font-weight: 500;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    /* Secret Admin Entry Footer */
+    /* ส่วน footer ด้านล่างสุด */
     footer {
-      margin-top: 10px;
       font-size: 0.8rem;
-      color: #bbb;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      align-items: center;
     }
 
     .secret-admin {
-      color: #bbb;
+      color: var(--text-muted);
       text-decoration: none;
       font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 4px;
       transition: color 0.2s;
     }
-    .secret-admin:hover { color: #888; }
+
+    .secret-admin:hover {
+      color: var(--text-dark);
+    }
   </style>
 </head>
 <body>
 
   <div class="bio-container">
-    <!-- Profile Header -->
-    <div class="profile-logo">
-      <i class="fa-solid fa-shirt"></i>
+    <!-- โลโก้ร้าน -->
+    <div class="avatar-wrapper">
+      <img src="logo.png" alt="MYCHISHOP" class="profile-logo-img" onerror="this.src='https://via.placeholder.com/150/ffffff/f9c7d7?text=MYCHI'">
     </div>
+
+    <!-- ชื่อร้าน -->
     <div class="username">@mychishop</div>
 
-    <!-- Main Link Buttons -->
+    <!-- ปุ่มลิงก์หลัก -->
     <div class="link-list">
-      <!-- ปุ่มเปิด Popup สินค้า -->
-      <button class="link-btn catalog" onclick="openCatalog()">
+      <!-- ปุ่มรวมสินค้า ลิงก์ไป catalog.html -->
+      <a href="catalog.html" class="link-btn catalog">
         <div class="btn-icon"><i class="fa-solid fa-bag-shopping"></i></div>
-        <span>รวม ชุดในร้าน</span>
-        <i class="fa-solid fa-ellipsis-vertical" style="opacity: 0.3;"></i>
-      </button>
+        <span class="btn-text">รวมสินค้า</span>
+        <i class="fa-solid fa-ellipsis-vertical dots-icon"></i>
+      </a>
 
-      <!-- ปุ่มสอบถาม LINE -->
+      <!-- ปุ่มสอบถาม / สั่งซื้อ ลิงก์ไป LINE -->
       <a href="https://line.me/ti/p/~your_line_id" target="_blank" class="link-btn line">
         <div class="btn-icon"><i class="fa-brands fa-line"></i></div>
-        <span>สอบถาม / จองคิว</span>
-        <i class="fa-solid fa-ellipsis-vertical" style="opacity: 0.3;"></i>
+        <span class="btn-text">สอบถาม / สั่งซื้อ</span>
+        <i class="fa-solid fa-ellipsis-vertical dots-icon"></i>
       </a>
     </div>
 
-    <!-- Footer พร้อมปุ่มลับแอดมิน 🔒 -->
+    <!-- ลิงก์แอดมินล่างสุด -->
     <footer>
       <p>© 2026 MYCHISHOP</p>
-      <a href="admin.html" class="secret-admin" title="สำหรับแอดมิน"><i class="fa-solid fa-lock"></i> Admin Log-in</a>
+      <a href="admin.html" class="secret-admin" title="Admin Login">
+        <i class="fa-solid fa-lock"></i> Admin Log-in
+      </a>
     </footer>
   </div>
-
-  <!-- ========================================= -->
-  <!-- POPUP CATALOG MODAL                       -->
-  <!-- ========================================= -->
-  <div class="modal-overlay" id="catalogModal" onclick="closeCatalogOnOverlay(event)">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-title">
-          <i class="fa-solid fa-sparkles" style="color: #e799b0;"></i> แคตตาล็อกสินค้าในร้าน
-        </div>
-        <button class="close-btn" onclick="closeCatalog()"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-      <div class="modal-body">
-        <div id="productList" class="product-grid">
-          <p style="text-align: center; color: #999; font-size: 0.9rem; padding: 20px;">กำลังโหลดสินค้า...</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // *** อย่าลืมนำ Web App URL ของ Google Apps Script มาวางตรงนี้ ***
-    const API_URL = "https://script.google.com/macros/s/AKfycbz0hzLZ9nMyh7erc0F0mKgL_aDHN6_HBBew5JM2gfcxeHiZQIWvPAX-5ukkhEmLS7zb/exec";
-
-    let productsLoaded = false;
-
-    // ฟังก์ชันเปิด Popup
-    function openCatalog() {
-      document.getElementById('catalogModal').classList.add('active');
-      if (!productsLoaded) {
-        loadProducts();
-      }
-    }
-
-    // ฟังก์ชันปิด Popup
-    function closeCatalog() {
-      document.getElementById('catalogModal').classList.remove('active');
-    }
-
-    function closeCatalogOnOverlay(event) {
-      if (event.target.id === 'catalogModal') {
-        closeCatalog();
-      }
-    }
-
-    // ฟังก์ชันดึงข้อมูลสินค้าจาก Apps Script
-    async function loadProducts() {
-      const container = document.getElementById('productList');
-      try {
-        const response = await fetch(API_URL);
-        const products = await response.json();
-
-        if (!Array.isArray(products) || products.length === 0) {
-          container.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">ยังไม่มีรายการสินค้าในขณะนี้</p>';
-          return;
-        }
-
-        container.innerHTML = "";
-        products.forEach(item => {
-          const isActive = (item.status && item.status.toString().toLowerCase() === 'active');
-          const img = item.image_url || 'https://via.placeholder.com/150';
-          const orderMsg = encodeURIComponent(`สวัสดีค่ะ สนใจสั่งซื้อสินค้า: ${item.name} (รหัส: ${item.id}) ราคา ฿${item.price}`);
-          const lineLink = item.line_link ? `${item.line_link}?text=${orderMsg}` : '#';
-
-          const card = document.createElement('div');
-          card.className = 'product-card';
-          card.innerHTML = `
-            <img class="product-img" src="${img}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/150'">
-            <div class="product-info">
-              <div class="product-name">${item.name}</div>
-              <div class="product-price">฿${Number(item.price).toLocaleString()}</div>
-              ${isActive 
-                ? `<a href="${lineLink}" target="_blank" class="order-mini-btn"><i class="fa-brands fa-line"></i> สั่งซื้อ</a>`
-                : `<span style="font-size:0.75rem; color:#aaa;">หมดชั่วคราว</span>`
-              }
-            </div>
-          `;
-          container.appendChild(card);
-        });
-
-        productsLoaded = true;
-
-      } catch (e) {
-        container.innerHTML = '<p style="text-align: center; color: #e63946; padding: 20px;">เกิดข้อผิดพลาดในการโหลดสินค้า</p>';
-      }
-    }
-  </script>
 
 </body>
 </html>
